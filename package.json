@@ -1,7 +1,7 @@
 {
   "name": "hubot-yammer",
-  "version": "0.0.8",
-  "author": "Aurélien Thieriot",
+  "version": "1.0.0",
+  "author": "Koichiro Haga",
   "keywords": [
     "github hubot yammer adapter"
   ],
@@ -9,16 +9,16 @@
   "licenses": [
     {
       "type": "MIT",
-      "url": "http://github.com/tombell/hubot-twilio/raw/master/LICENSE"
+      "url": "http://opensource.org/licenses/mit-license.php"
     }
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/athieriot/hubot-yammer.git"
+    "url": "git://github.com/kcato99/hubot-yammer.git"
   },
   "dependencies": {
     "hubot": ">=2.3.0",
-    "request": "2.9.3" 
+    "request": "2.9.3"
   },
   "devDependencies": {
     "coffee-script": "1.1.3"

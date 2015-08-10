@@ -2,7 +2,7 @@ var request = require('request')
   , qs = require('querystring')
   , url = require('url')
   ;
-  
+
 function RealTime (yam) {
   this.yam = yam;
 }
@@ -12,7 +12,7 @@ RealTime.prototype.messages = function (cb) {
     var meta = body.meta.realtime
       , id = 1
       ;
-      
+
     request(
       { url: meta.uri + 'handshake'
       , headers: {'content-type':'application/json'}
@@ -60,7 +60,7 @@ RealTime.prototype.messages = function (cb) {
                 [ { channel: "/meta/connect"
                   , connectionType: 'long-polling'
                   , id: id
-                  , clientId: handshake.clientId 
+                  , clientId: handshake.clientId
                   }
                 ])
               }, function (e, resp, b) {
@@ -88,35 +88,15 @@ function Yammer (opts) {
   this.realtime = new RealTime(this);
 }
 Yammer.prototype._req = function (opts, cb) {
-  var auth
-  if (!this.opts.access_token) {
-    auth = 'OAuth ' +
-           'oauth_consumer_key="'+this.opts.oauth_consumer_key+'",' +
-           'oauth_token="'+this.opts.oauth_token+'",' +
-           'oauth_signature_method="'+ (this.opts.oauth_signature_method || "PLAINTEXT") + '",' +
-           'oauth_timestamp="'+(this.opts.oauth_timestamp || (new Date()).getTime())+'",' +
-           'oauth_nonce="'+(this.opts.oauth_nonce || Math.floor(Math.random()*1111111111))+'",' +
-           'oauth_verifier="'+this.opts.oauth_verifier+'",' +
-           'oauth_signature="'+this.opts.oauth_signature+'%26'+this.opts.oauth_token_secret+'"'
-           ;
-  }
-  
-  
+  var auth = 'Bearer ' + this.opts.oauth_token;
+
   if (opts.uri[opts.uri.length - 1] === '.') {
     opts.uri += (this.opts.format || 'json');
   }
-  
-  if (this.opts.access_token) {
-    var u = url.parse(opts.uri);
-    var q = qs.parse(u.query);
-    q.access_token = this.opts.access_token;
-    opts.uri = u.protocol + '//' + u.host + u.pathname + '?' + qs.stringify(q);
-  }
-  
+
   if (!opts.headers) opts.headers = {};
-  if (auth) {
-    opts.headers.authorization = auth;
-  }
+  opts.headers.authorization = auth;
+
   // console.log(opts.body)
   request(opts, function (e, resp, body) {
     if (e) return cb(e);
@@ -222,7 +202,7 @@ Yammer.prototype.checkUserSubscription = function (userid, cb) {
   this._get('https://www.yammer.com/api/v1/subscriptions/to_user/'+userid+'.', function (e, body, resp) {
     if (resp.statusCode === 404) {
       return cb(null, false);
-    } 
+    }
     if (e) return cb(e, body);
     cb(null, body);
   });
@@ -231,7 +211,7 @@ Yammer.prototype.checkTagSubscription = function (tagid, cb) {
   this._get('https://www.yammer.com/api/v1/subscriptions/to_tag/'+tagid+'.', function (e, body, resp) {
     if (resp.statusCode === 404) {
       return cb(null, false);
-    } 
+    }
     if (e) return cb(e, body);
     cb(null, body);
   });
@@ -240,7 +220,7 @@ Yammer.prototype.checkThreadSubscription = function (threadid, cb) {
   this._get('https://www.yammer.com/api/v1/subscriptions/to_thread/'+threadid+'.', function (e, body, resp) {
     if (resp.statusCode === 404) {
       return cb(null, false);
-    } 
+    }
     if (e) return cb(e, body);
     cb(null, body);
   });
@@ -249,7 +229,7 @@ Yammer.prototype.checkTopicSubscription = function (topicid, cb) {
   this._get('https://www.yammer.com/api/v1/subscriptions/to_topic/'+topicid+'.', function (e, body, resp) {
     if (resp.statusCode === 404) {
       return cb(null, false);
-    } 
+    }
     if (e) return cb(e, body);
     cb(null, body);
   });

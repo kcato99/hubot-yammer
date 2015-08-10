@@ -22,16 +22,13 @@ class YammerAdapter extends Adapter
  prepare_string: (str, callback) ->
      text = str
      yamsText = [str]
-     yamsText.forEach (yamText) => 
+     yamsText.forEach (yamText) =>
         callback yamText
 
  run: ->
    self = @
    options =
-    key         : process.env.HUBOT_YAMMER_KEY
-    secret      : process.env.HUBOT_YAMMER_SECRET
     token       : process.env.HUBOT_YAMMER_TOKEN
-    tokensecret : process.env.HUBOT_YAMMER_TOKEN_SECRET
     groups      : process.env.HUBOT_YAMMER_GROUPS or "hubot"
     reply_self  : process.env.HUBOT_YAMMER_REPLY_SELF # for debugging use:  HUBOT_YAMMER_REPLY_SELF=1 bin/hubot -n bot -a yammer
    bot = new YammerRealtime(options)
@@ -59,7 +56,7 @@ class YammerAdapter extends Adapter
          console.log "received error: #{err}"
 
    @bot = bot
-   self.emit 'connected' 
+   self.emit 'connected'
 
 exports.use = (robot) ->
  new YammerAdapter robot
@@ -68,19 +65,18 @@ class YammerRealtime extends EventEmitter
  self = @
  groups_ids = []
  constructor: (options) ->
-    if options.token? and options.secret? and options.key? and options.tokensecret?
-      @yammer = new Yammer
-         oauth_consumer_key   : options.key
+    if options.token?
+         @yammer = new Yammer
          oauth_token          : options.token
-         oauth_signature      : options.secret
-         oauth_token_secret   : options.tokensecret
 
       @groups_ids = @resolving_groups_ids options.groups
+      @groups     = @create_group_hash options.groups
+
       @reply_self = options.reply_self
     else
-      throw new Error "Not enough parameters provided. I need a key, a secret, a token, a secret token"
+      throw new Error "Not enough parameters provided. I need a token"
 
- ## Yammer API call methods    
+ ## Yammer API call methods
  listen: (callback) ->
    @yammer.realtime.messages (err, data) ->
      callback err, data.data
@@ -89,11 +85,18 @@ class YammerRealtime extends EventEmitter
    if user && user.thread_id
      @reply user, yamText
    else
-     #TODO: Adapt to flood overflow
-     groups_ids.forEach (group_id) =>
+     room = user["room"]
+     if room
        params =
          body          : yamText
-         group_id      : group_id
+         group_id      : @groups[room]
+
+       @create_group_hash params
+     else
+       groups_ids.forEach (group_id) =>
+         params =
+           body          : yamText
+           group_id      : group_id
 
        console.log "send message to group #{params.group_id} with text #{params.body}"
        @create_message params
@@ -146,5 +149,20 @@ class YammerRealtime extends EventEmitter
 
       if result.length is 0
          throw new Error "No group registered or an error occured to resolve IDs."
+
+ create_group_hash: (groups) ->
+   result = {}
+
+   @yammer.groups (err, data) ->
+     if err
+       console.log "yammer groups error: #{err} #{data}"
+     else
+       data.forEach (existing_group) =>
+         groups.split(",").forEach (group) =>
+           if group.toString().toLowerCase() is existing_group.name.toString().toLowerCase()
+             result[existing_group.name] = existing_group.id
+
+     if Object.keys(result).length is 0
+       throw new Error "No group registered or an error occured to resolve IDs."
 
    result
