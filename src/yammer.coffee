@@ -91,7 +91,7 @@ class YammerRealtime extends EventEmitter
          body          : yamText
          group_id      : @groups[room]
 
-       @create_group_hash params
+       @create_message params
      else
        groups_ids.forEach (group_id) =>
          params =
@@ -149,6 +149,8 @@ class YammerRealtime extends EventEmitter
 
       if result.length is 0
          throw new Error "No group registered or an error occured to resolve IDs."
+
+   result
 
  create_group_hash: (groups) ->
    result = {}
