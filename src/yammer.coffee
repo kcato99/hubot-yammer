@@ -52,6 +52,7 @@ class YammerAdapter extends Adapter
                  id: sender_id
                  thread_id: thread_id
                self.receive new TextMessage user, text
+
       if err
          console.log "received error: #{err}"
 
@@ -66,7 +67,7 @@ class YammerRealtime extends EventEmitter
  groups_ids = []
  constructor: (options) ->
     if options.token?
-         @yammer = new Yammer
+      @yammer = new Yammer
          oauth_token          : options.token
 
       @groups_ids = @resolving_groups_ids options.groups
