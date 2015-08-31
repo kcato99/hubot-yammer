@@ -110,17 +110,6 @@ class YammerRealtime extends EventEmitter
 
  ## Utility methods
  create_message: (params) ->
-   # Build opengraph urls
-   urls = params.body.match /\bhttps?:\/\/[^ ]+/
-   if urls
-     og_url = urls[0]
-     params['og_url'] = og_url
-     if og_url.match /.*\.(gif|png|jpg|jpeg)/i
-       # Try to identify images
-       params['og_image'] = og_url
-     else
-       # let yammer do its best...
-       params['og_fetch'] = true
 
    @yammer.createMessage params, (err, data, res) ->
       if err
