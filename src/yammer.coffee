@@ -1,10 +1,10 @@
-Robot   = require('hubot').Robot
-Adapter = require('hubot').Adapter
-TextMessage = require('hubot').TextMessage
+Robot        = require('hubot').Robot
+Adapter      = require('hubot').Adapter
+TextMessage  = require('hubot').TextMessage
 
 HTTPS        = require 'https'
 EventEmitter = require('events').EventEmitter
-Yammer        = require('./node-yammer').Yammer
+Yammer       = require('./node-yammer').Yammer
 
 class YammerAdapter extends Adapter
  send: (envelope, strings...) ->
@@ -29,7 +29,7 @@ class YammerAdapter extends Adapter
    self = @
    options =
     token       : process.env.HUBOT_YAMMER_TOKEN
-    groups      : process.env.HUBOT_YAMMER_GROUPS or "hubot"
+    groups      : process.env.HUBOT_YAMMER_GROUPS or "deploy"
     reply_self  : process.env.HUBOT_YAMMER_REPLY_SELF # for debugging use:  HUBOT_YAMMER_REPLY_SELF=1 bin/hubot -n bot -a yammer
    bot = new YammerRealtime(options)
 
