@@ -30,7 +30,6 @@ class YammerAdapter extends Adapter
    options =
     token       : process.env.HUBOT_YAMMER_TOKEN
     groups      : process.env.HUBOT_YAMMER_GROUPS or "deploy"
-    reply_self  : process.env.HUBOT_YAMMER_REPLY_SELF # for debugging use:  HUBOT_YAMMER_REPLY_SELF=1 bin/hubot -n bot -a yammer
    bot = new YammerRealtime(options)
 
    bot.listen (err, data) ->
@@ -43,7 +42,7 @@ class YammerAdapter extends Adapter
              sender_id = message.sender_id
              text = message.body.plain
              console.log "received #{text} from #{user_name} (thread_id: #{thread_id}, sender_id: #{sender_id})"
-             if self_id == sender_id && !bot.reply_self
+             if self_id == sender_id
                me = self.robot.name
                console.log "#{me} does not reply himself, #{me} not crazy nor desperate"
              else
@@ -72,8 +71,6 @@ class YammerRealtime extends EventEmitter
 
       @groups_ids = @resolving_groups_ids options.groups
       @groups     = @create_group_hash options.groups
-
-      @reply_self = options.reply_self
     else
       throw new Error "Not enough parameters provided. I need a token"
 
