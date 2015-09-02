@@ -67,7 +67,7 @@ class YammerRealtime extends EventEmitter
  constructor: (options) ->
     if options.token?
       @yammer = new Yammer
-         oauth_token          : options.token
+         oauth_token : options.token
 
       @groups_ids = @resolving_groups_ids options.groups
       @groups     = @create_group_hash options.groups
@@ -82,22 +82,17 @@ class YammerRealtime extends EventEmitter
  send: (user, yamText) ->
    if user && user.thread_id
      @reply user, yamText
-   else
-     room = user["room"]
-     if room
+   else if typeof yamText != 'object'
+     groups_ids.forEach (group_id) =>
        params =
          body          : yamText
-         group_id      : @groups[room]
-
-       @create_message params
-     else
-       groups_ids.forEach (group_id) =>
-         params =
-           body          : yamText
-           group_id      : group_id
-
+         group_id      : group_id
        console.log "send message to group #{params.group_id} with text #{params.body}"
-       @create_message params
+     @create_message params
+   else
+     params = yamText
+     console.log "send message params: ", params
+     @create_message params
 
  reply: (user, yamText) ->
    if user && user.thread_id
